@@ -1,0 +1,217 @@
+\documentclass[a4paper]{article}
+
+\usepackage[a4paper,
+top=2cm,
+bottom=2.5cm,
+left=1.5cm,
+right=1.5cm,
+marginparwidth=1.75cm]{geometry}
+
+\usepackage[english]{babel}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{graphicx}
+\graphicspath{{./images/}}
+
+\title{D7054E Group Project \\
+Predicting House Prices Using Machine Learning}
+
+\author{
+Avijit Saha (avisah-5) \\
+Seyed Morteza Salehi (seysal-4) \\
+Course: D7054E Data Science Programming
+}
+
+\date{15 March 2026}
+
+\begin{document}
+\maketitle
+
+\abstract{
+Accurate house price prediction is essential for buyers, sellers, and real estate professionals. Traditional valuation methods often fail to capture complex, nonlinear relationships between property characteristics and market prices. This project applies a complete data science workflow to predict house prices using supervised machine learning techniques. The Ames Housing dataset from Kaggle is used, with emphasis on robust feature engineering, model comparison, and interpretability. Multiple regression and ensemble models are evaluated using cross-validation and performance metrics such as RMSE and R\textsuperscript{2}. Ethical considerations related to bias and fairness in real estate pricing are also discussed.
+}
+
+% =====================================================
+\section*{Introduction}
+
+House price prediction is a classic regression problem in data science with significant real-world relevance. Accurate predictive models can support better decision-making in the real estate market by capturing relationships between property attributes such as size, quality, and location.
+
+This project follows the IMRaD structure and implements a full data science pipeline including data retrieval, exploratory data analysis (EDA), preprocessing, feature engineering, model training, evaluation, and ethical reflection. The work extends beyond baseline implementations by introducing additional engineered features and systematic model comparison.
+
+% =====================================================
+\section*{Problem Statement and Hypotheses}
+
+\subsection*{Business / Real-life Problem}
+
+Given a set of residential property characteristics, the objective is to predict the final sale price of a house as accurately as possible.
+
+\subsection*{Hypotheses}
+
+\begin{itemize}
+    \item \textbf{H1:} Structural features such as living area, number of rooms, and year built have a significant impact on house prices.
+    \item \textbf{H2:} Quality-related and location-related features contribute more to predictive accuracy than size-based features alone.
+    \item \textbf{H3:} Ensemble models outperform linear regression models for this dataset.
+\end{itemize}
+
+% =====================================================
+\section*{Data Description and Retrieval}
+
+\subsection*{Dataset}
+
+\begin{itemize}
+    \item \textbf{Source:} Kaggle – House Prices: Advanced Regression Techniques
+    \item \textbf{Observations:} 1,460 residential properties
+    \item \textbf{Features:} 79 explanatory variables
+    \item \textbf{Target variable:} \texttt{SalePrice}
+\end{itemize}
+
+\subsection*{Data Retrieval}
+
+The dataset was downloaded from Kaggle and loaded locally as CSV files using the \texttt{pandas} library.
+
+\begin{verbatim}
+import pandas as pd
+
+train_df = pd.read_csv("data/train.csv")
+test_df = pd.read_csv("data/test.csv")
+\end{verbatim}
+
+% =====================================================
+\section*{Exploratory Data Analysis}
+
+\subsection*{Methodology}
+
+Exploratory analysis included:
+\begin{itemize}
+    \item Distribution analysis of the target variable
+    \item Correlation analysis for numerical features
+    \item Missing value inspection
+    \item Outlier detection using boxplots
+\end{itemize}
+
+\subsection*{Key Observations}
+
+The target variable \texttt{SalePrice} exhibited right skewness. A logarithmic transformation improved normality. Strong correlations were observed for features such as \texttt{OverallQual}, \texttt{GrLivArea}, and \texttt{GarageCars}.
+
+\begin{verbatim}
+import numpy as np
+train_df['SalePrice_log'] = np.log1p(train_df['SalePrice'])
+\end{verbatim}
+
+% =====================================================
+\section*{Data Cleaning and Preprocessing}
+
+\subsection*{Missing Values}
+
+\begin{itemize}
+    \item Numerical features were imputed using median values
+    \item Categorical features were imputed using mode or an explicit \texttt{"None"} category
+\end{itemize}
+
+\subsection*{Encoding and Scaling}
+
+Categorical variables were encoded using one-hot encoding. Feature scaling was applied to linear and regularized models using standardization.
+
+% =====================================================
+\section*{Feature Engineering}
+
+To extend beyond baseline solutions, additional features were engineered:
+
+\begin{itemize}
+    \item \textbf{HouseAge:} Difference between year sold and year built
+    \item \textbf{TotalSF:} Combined total square footage
+    \item Removal of highly collinear features using VIF analysis
+\end{itemize}
+
+\begin{verbatim}
+train_df['HouseAge'] = train_df['YrSold'] - train_df['YearBuilt']
+train_df['TotalSF'] = (
+    train_df['TotalBsmtSF'] +
+    train_df['1stFlrSF'] +
+    train_df['2ndFlrSF']
+)
+\end{verbatim}
+
+% =====================================================
+\section*{Model Selection and Training}
+
+\subsection*{Models Implemented}
+
+\begin{itemize}
+    \item Linear Regression
+    \item Ridge Regression
+    \item Lasso Regression
+    \item Random Forest Regressor
+    \item Gradient Boosting Regressor
+\end{itemize}
+
+\subsection*{Training Strategy}
+
+Five-fold cross-validation was used. Hyperparameters were optimized using grid search.
+
+\begin{verbatim}
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import GridSearchCV
+\end{verbatim}
+
+% =====================================================
+\section*{Results and Evaluation}
+
+\subsection*{Evaluation Metrics}
+
+\begin{itemize}
+    \item Root Mean Squared Error (RMSE)
+    \item R\textsuperscript{2} score
+\end{itemize}
+
+\subsection*{Results Summary}
+
+Linear models offered interpretability but lower accuracy. Ensemble models significantly reduced RMSE and provided better generalization performance. Feature importance analysis supported hypotheses H1 and H2.
+
+% =====================================================
+\section*{Discussion}
+
+The results demonstrate that nonlinear models capture feature interactions more effectively than linear approaches. Feature engineering contributed substantially to improved model performance. Cross-validation helped mitigate overfitting.
+
+% =====================================================
+\section*{Data Ethics Considerations}
+
+\begin{itemize}
+    \item Historical bias may be reflected in pricing patterns
+    \item Location features may act as proxies for sensitive attributes
+    \item Transparency is enhanced through interpretable models and feature importance analysis
+\end{itemize}
+
+Responsible deployment requires continuous monitoring and ethical awareness.
+
+% =====================================================
+\section*{System Design}
+
+The data science pipeline consists of the following stages:
+
+\begin{enumerate}
+    \item Data retrieval
+    \item Data cleaning and imputation
+    \item Feature engineering
+    \item Encoding and scaling
+    \item Model training and validation
+    \item Evaluation and visualization
+    \item Interpretation and ethical review
+\end{enumerate}
+
+% =====================================================
+\section*{Conclusion}
+
+This project demonstrates a complete and robust data science workflow for predicting house prices. By extending baseline solutions with advanced feature engineering, model comparison, and ethical reflection, the project meets both technical and academic objectives of the course.
+
+% =====================================================
+\section*{References}
+
+\begin{itemize}
+    \item Kaggle: House Prices – Advanced Regression Techniques
+    \item PEP 8 – Style Guide for Python Code
+    \item Google Python Style Guide
+\end{itemize}
+
+\end{document}
